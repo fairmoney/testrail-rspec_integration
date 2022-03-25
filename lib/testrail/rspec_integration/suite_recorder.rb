@@ -8,10 +8,12 @@ module Testrail
       end
 
       def call(example)
-        Testrail::RspecIntegration::ExampleHandler.new(
-          configuration: @configuration,
-          example: example
-        ).call
+        if @configuration.allow || @configuration.allow == "true"
+          Testrail::RspecIntegration::ExampleHandler.new(
+            configuration: @configuration,
+            example: example
+          ).call
+        end
       end
     end
   end

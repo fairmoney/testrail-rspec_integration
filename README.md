@@ -35,6 +35,7 @@ RSpec.configure do |config|
       recorder_config.username = "testrail-user"
       recorder_config.password = "testrail-password"
       recorder_config.run_name = git_sha
+      recorder_config.allow = true # To enable upload test result to TestRail
     end
   end
 

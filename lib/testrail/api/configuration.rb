@@ -7,6 +7,7 @@ module Testrail
       :run_name,
       :username,
       :password,
+      :allow,
       keyword_init: true
     )
   end

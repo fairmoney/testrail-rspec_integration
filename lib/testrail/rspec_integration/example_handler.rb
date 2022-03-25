@@ -25,12 +25,16 @@ module Testrail
           @client.add_resource(
             "result_for_case",
             resource_ids: [run["id"], case_id],
-            payload: {status_id: status_id}
+            payload: {status_id: status_id, comment: add_comment}
           )
         end
       end
 
       private
+
+      def add_comment
+        @example.exception.message if status_id == TEST_STATUSES[:failed]
+      end
 
       def status_id
         return TEST_STATUSES[:failed] if @example.exception && !@example.exception.message.include?("pending")
@@ -73,7 +77,7 @@ module Testrail
       end
 
       def case_ids
-        @example.metadata[CASE_IDS_KEY_NAME]
+        @example.metadata[CASE_IDS_KEY_NAME].map {|a| a.tr("C", "")}
       end
     end
   end
