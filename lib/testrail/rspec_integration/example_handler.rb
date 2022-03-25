@@ -34,7 +34,7 @@ module Testrail
       private
 
       def add_comment
-        @example.exception.message if status_id == TEST_STATUSES[:failed]
+        @example.location + @example.exception.message if status_id == TEST_STATUSES[:failed]
       end
 
       def status_id
