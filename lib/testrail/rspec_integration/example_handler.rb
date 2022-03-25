@@ -3,6 +3,7 @@ module Testrail
     class ExampleHandler
       SUITE_ID_KEY_NAME = :testrail_suite_id
       CASE_IDS_KEY_NAME = :testrail_case_ids
+      TESTRAIL_CASE_PREFIX = "C".freeze
 
       TEST_STATUSES = {
         passed: 1,
@@ -77,7 +78,7 @@ module Testrail
       end
 
       def case_ids
-        @example.metadata[CASE_IDS_KEY_NAME].map {|a| a.tr("C", "")}
+        @example.metadata[CASE_IDS_KEY_NAME].map { |id| id.tr(TESTRAIL_CASE_PREFIX, "") }
       end
     end
   end

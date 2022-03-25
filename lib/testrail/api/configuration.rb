@@ -7,7 +7,7 @@ module Testrail
       :run_name,
       :username,
       :password,
-      :allow,
+      :upload_results,
       keyword_init: true
     )
   end
