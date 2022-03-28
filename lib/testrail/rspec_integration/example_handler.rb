@@ -46,9 +46,11 @@ module Testrail
       end
 
       def find_or_create_run
-        return create_run if pending_runs.empty?
-
-        pending_runs.first
+        if $current_run
+          $current_run["suite_id"] == current_suite_id ? $current_run : create_run
+        else
+          create_run
+        end
       end
 
       def create_run
@@ -57,20 +59,6 @@ module Testrail
           resource_ids: [@configuration.project_id],
           payload: {suite_id: current_suite_id, name: @configuration.run_name}
         )
-      end
-
-      def pending_runs
-        @pending_runs ||= @client
-          .get_resource(
-            "runs",
-            resource_ids: [@configuration.project_id],
-            payload: {
-              suite_id: current_suite_id,
-              is_completed: 0
-            }
-          )
-          .fetch("runs", [])
-          .select { |run| run["name"] == @configuration.run_name }
       end
 
       def current_suite_id

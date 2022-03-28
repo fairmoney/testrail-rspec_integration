@@ -13,7 +13,6 @@ module Testrail
       def initialize(configuration:)
         @connection = Faraday.new(url: configuration.project_url, headers: DEFAULT_HEADERS) do |conn|
           conn.request(:authorization, :basic, configuration.username, configuration.password)
-          conn.response :logger
           conn.use(Faraday::Response::RaiseError)
         end
       end
