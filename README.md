@@ -35,12 +35,18 @@ RSpec.configure do |config|
       recorder_config.username = "testrail-user"
       recorder_config.password = "testrail-password"
       recorder_config.run_name = git_sha
+      recorder_config.upload_results = true
     end
   end
 
   config.after(:example, testrail_case_ids: proc { |value| !value.empty? }) do |example|
     config.testrail_recorder.call(example)
   end
+
+  config.after(:suite) do
+    config.testrail_recorder.close_open_runs
+  end
+
 end
 ```
 

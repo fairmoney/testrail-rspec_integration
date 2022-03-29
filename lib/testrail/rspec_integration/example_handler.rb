@@ -3,6 +3,8 @@ module Testrail
     class ExampleHandler
       SUITE_ID_KEY_NAME = :testrail_suite_id
       CASE_IDS_KEY_NAME = :testrail_case_ids
+      TESTRAIL_CASE_PREFIX = "C".freeze
+      TEST_RAIL_RUNS = []
 
       TEST_STATUSES = {
         passed: 1,
@@ -23,14 +25,28 @@ module Testrail
 
         case_ids.each do |case_id|
           @client.add_resource(
-            "result_for_case",
+            "add_result_for_case",
             resource_ids: [run["id"], case_id],
-            payload: {status_id: status_id}
+            payload: {status_id: status_id, comment: add_comment}
+          )
+        end
+      end
+
+      def close_runs
+        TEST_RAIL_RUNS.each do |run|
+          @client.add_resource(
+            "close_run",
+            resource_ids: run["id"],
+            payload: {}
           )
         end
       end
 
       private
+
+      def add_comment
+        @example.location + @example.exception.message if status_id == TEST_STATUSES[:failed]
+      end
 
       def status_id
         return TEST_STATUSES[:failed] if @example.exception && !@example.exception.message.include?("pending")
@@ -41,31 +57,24 @@ module Testrail
       end
 
       def find_or_create_run
-        return create_run if pending_runs.empty?
-
-        pending_runs.first
+        unless TEST_RAIL_RUNS.empty?
+          TEST_RAIL_RUNS.each do |run|
+            return run if run["suite_id"] == current_suite_id
+          end
+          create_run
+        else
+          create_run
+        end
       end
 
       def create_run
-        @client.add_resource(
-          "run",
+        new_run = @client.add_resource(
+          "add_run",
           resource_ids: [@configuration.project_id],
           payload: {suite_id: current_suite_id, name: @configuration.run_name}
         )
-      end
-
-      def pending_runs
-        @pending_runs ||= @client
-          .get_resource(
-            "runs",
-            resource_ids: [@configuration.project_id],
-            payload: {
-              suite_id: current_suite_id,
-              is_completed: 0
-            }
-          )
-          .fetch("runs", [])
-          .select { |run| run["name"] == @configuration.run_name }
+        TEST_RAIL_RUNS << new_run
+        new_run
       end
 
       def current_suite_id
@@ -73,7 +82,7 @@ module Testrail
       end
 
       def case_ids
-        @example.metadata[CASE_IDS_KEY_NAME]
+        @example.metadata[CASE_IDS_KEY_NAME].map { |id| id.tr(TESTRAIL_CASE_PREFIX, "") }
       end
     end
   end

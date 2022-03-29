@@ -13,7 +13,6 @@ module Testrail
       def initialize(configuration:)
         @connection = Faraday.new(url: configuration.project_url, headers: DEFAULT_HEADERS) do |conn|
           conn.request(:authorization, :basic, configuration.username, configuration.password)
-          conn.response :logger
           conn.use(Faraday::Response::RaiseError)
         end
       end
@@ -25,7 +24,7 @@ module Testrail
       end
 
       def add_resource(resource_name, resource_ids:, payload:)
-        url = ["add_#{resource_name}", *resource_ids].join("/")
+        url = ["#{resource_name}", *resource_ids].join("/")
 
         do_request(method: :post, url: url, payload: payload)
       end
