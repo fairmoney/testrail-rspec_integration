@@ -24,7 +24,7 @@ module Testrail
       end
 
       def add_resource(resource_name, resource_ids:, payload:)
-        url = ["add_#{resource_name}", *resource_ids].join("/")
+        url = ["#{resource_name}", *resource_ids].join("/")
 
         do_request(method: :post, url: url, payload: payload)
       end

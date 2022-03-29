@@ -42,6 +42,11 @@ RSpec.configure do |config|
   config.after(:example, testrail_case_ids: proc { |value| !value.empty? }) do |example|
     config.testrail_recorder.call(example)
   end
+
+  config.after(:suite) do
+    config.testrail_recorder.close_open_runs
+  end
+
 end
 ```
 
